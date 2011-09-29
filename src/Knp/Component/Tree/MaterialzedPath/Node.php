@@ -92,7 +92,7 @@ trait Node
 
         $parent_path = \implode(self::PATH_SEPARATOR, $path);
 
-        return $parent_path ?: '/';
+        return $parent_path ?: self::PATH_SEPARATOR;
     }
 
     /**
@@ -108,6 +108,11 @@ trait Node
     public function getParent()
     {
         return $this->parent;
+    }
+
+    public function setParent(NodeInterface $node)
+    {
+        $this->parent = $node;
     }
 
     public function getExplodedPath()
@@ -140,6 +145,24 @@ trait Node
         $this->sort = $sort;
     }
 
+    public function getRootPath()
+    {
+        $explodedPath = $this->getExplodedPath();
+        array_shift($explodedPath); // first is empty
+
+        return self::PATH_SEPARATOR . array_shift($explodedPath);
+    }
+
+    public function getRoot()
+    {
+        $parent = $this;
+        while(null !== $parent) {
+            $parent = $parent->getParent();
+        }
+
+        return $parent;
+    }
+
     public function buildTree(\Traversable $results)
     {
         $tree = array($this->getPath() => $this);
@@ -147,7 +170,66 @@ trait Node
 
             $tree[$node->getPath()] = $node;
 
-            $tree[$node->getParentPath()]->addChild($node);
+            $parent = isset($tree[$node->getParentPath()]) ? $tree[$node->getParentPath()] : $this; // root is the fallback parent
+            $parent->addChild($node);
+            $node->setParent($parent);
         }
+    }
+
+    /**
+     * @param \Closure $prepare a function to preapre the node before putting into the result
+     *
+     * @return string the json representation of the hierarchical result
+     **/
+    public function toJson(\Closure $prepare = null)
+    {
+        $tree = $this->toArray($prepare);
+
+        return json_encode($tree);
+    }
+
+    /**
+     * @param \Closure $prepare a function to preapre the node before putting into the result
+     * @param array $tree a reference to an array, used internally for recursion
+     *
+     * @return array the hierarchical result
+     **/
+    public function toArray(\Closure $prepare = null, array &$tree = null)
+    {
+        if(null === $prepare) {
+            $prepare = function(NodeInterface $node) {
+                return (string)$node;
+            };
+        }
+        if (null === $tree) {
+            $tree = array($this->getId() => array('node' => $prepare($this), 'children' => array()));
+        }
+
+        foreach($this->getNodeChildren() as $node) {
+            $tree[$this->getId()]['children'][$node->getId()] = array('node' => $prepare($node), 'children' => array());
+            $node->toArray($prepare, $tree[$this->getId()]['children']);
+        }
+
+        return $tree;
+    }
+
+    public function toFlatArray(\Closure $prepare = null, array &$tree = null)
+    {
+        if(null === $prepare) {
+            $prepare = function(NodeInterface $node) {
+                $pre = $node->getLevel() > 1 ? implode('', array_fill(0, $node->getLevel(), '--')) : '';
+                return (string)$node;
+            };
+        }
+        if (null === $tree) {
+            $tree = array($this->getId() => $prepare($this));
+        }
+
+        foreach($this->getNodeChildren() as $node) {
+            $tree[$node->getId()] = $prepare($node);
+            $node->toFlatArray($prepare, $tree);
+        }
+
+        return $tree;
     }
 }
