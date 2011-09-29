@@ -258,6 +258,10 @@ class MenuItem implements TreeNodeInterface
 
     public function setChildOf(TreeNodeInterface $item)
     {
+        $id = $this->getId();
+        if (empty($id)) {
+            throw new \LogicException('You must provide an id for this node if you want it to be part of a tree.');
+        }
         $this->setPath($item->getPath() . self::PATH_SEPARATOR . $this->getId());
 
         if (null !== $this->parent) {

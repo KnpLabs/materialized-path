@@ -61,7 +61,8 @@ trait Node
 
     public function setChildOf(TreeNodeInterface $node)
     {
-        if (empty($this->getId())) {
+        $id = $this->getId();
+        if (empty($id)) {
             throw new \LogicException('You must provide an id for this node if you want it to be part of a tree.');
         }
 
