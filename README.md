@@ -1,6 +1,6 @@
 == Materialized paths for PHP 5.4 ==
 
-Imagine you want to manaage a tree the OO way without beeing tied to any ORM.
+Imagine you want to manage a tree the OO way without beeing tied to any ORM.
 
 This library wants to be simple, you'll only need to use a Trait and provide a flat resultset.
 
