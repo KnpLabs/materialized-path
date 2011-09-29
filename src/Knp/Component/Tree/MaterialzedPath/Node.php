@@ -29,6 +29,8 @@ trait Node
     public function setPath($path)
     {
         $this->path = $path;
+
+        $this->setParentPath($this->getParentPath());
     }
 
     public function getChildren()
@@ -91,6 +93,16 @@ trait Node
         $parent_path = \implode(self::PATH_SEPARATOR, $path);
 
         return $parent_path ?: '/';
+    }
+
+    /**
+     * Set parent path.
+     *
+     * @param path the value to set.
+     */
+    public function setParentPath($path)
+    {
+        $this->parent_path = $path;
     }
 
     public function getParent()

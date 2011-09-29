@@ -29,6 +29,13 @@ interface NodeInterface
      **/
     function getParentPath();
 
+    /**
+     * Set parent path.
+     *
+     * @param path the value to set.
+     */
+    function setParentPath($path);
+
 
     /**
      * @return NodeInterface the parent node
