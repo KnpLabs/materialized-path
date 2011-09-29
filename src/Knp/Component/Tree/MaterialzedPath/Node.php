@@ -54,20 +54,24 @@ trait Node
     /**
      * @return boolean
      */
-    public function isChildOf(TreeNodeInterface $item)
+    public function isChildOf(TreeNodeInterface $node)
     {
-        return $this->getParentPath() === $item->getPath();
+        return $this->getParentPath() === $node->getPath();
     }
 
-    public function setChildOf(TreeNodeInterface $item)
+    public function setChildOf(TreeNodeInterface $node)
     {
-        $this->setPath($item->getPath() . self::PATH_SEPARATOR . $this->getId());
+        if (empty($this->getId())) {
+            throw new \LogicException('You must provide an id for this node if you want it to be part of a tree.');
+        }
+
+        $this->setPath($node->getPath() . self::PATH_SEPARATOR . $this->getId());
 
         if (null !== $this->parent) {
             $this->parent->getNodeChildren()->removeElement($this);
         }
 
-        $this->parent = $item;
+        $this->parent = $node;
         $this->parent->addChild($this);
 
         foreach($this->getNodeChildren() as $child)

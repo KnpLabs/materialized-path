@@ -12,6 +12,12 @@ use Doctrine\Common\Collections\Collection;
  */
 interface NodeInterface
 {
+
+    /**
+     * @return string the id that will represent the node in the path
+     **/
+    function getId();
+
     /**
      * @return string the materialized path,
      * eg the representation of path from all ancestors
