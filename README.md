@@ -1,16 +1,17 @@
-== Materialized paths for PHP 5.4 ==
+# Materialized paths for PHP 5.4
+
 
 Imagine you want to manage a tree the OO way without beeing tied to any ORM.
 
-This library wants to be simple, you'll only need to use a Trait and provide a flat resultset.
+This library wants to be simple, you'll only need to use a ``Trait`` and provide a flat resultSet.
 
 If you don't have Traits, [do as the compiler](https://wiki.php.net/rfc/horizontalreuse#static_methods), 
 ie: copy'n'paste the trait content in your class.
 
 
-Usage:
+## Usage:
 
-* Define a class that implements ``NodeInterface``:
+* **Define a class that implements ``NodeInterface``**:
 
 You'll notice i'm using a Doctrine Entity to implement the NodeInterface,
 but you could use any plain old php class.
@@ -23,7 +24,7 @@ but you could use any plain old php class.
 
 
     use Knp\Component\Tree\MaterialzedPath\Node;
-    use Knp\Component\Tree\MaterialzedPath\NodeInterface as TreeNodeInterface;
+    use Knp\Component\Tree\MaterialzedPath\NodeInterface;
 
     use Doctrine\Common\Collections\ArrayCollection;
     use Doctrine\ORM\Mapping as ORM;
@@ -35,7 +36,7 @@ but you could use any plain old php class.
     * @ORM\Entity(repositoryClass="Entity\MenuItemRepository")
     * @ORM\HasLifecycleCallbacks
     */
-    class MenuItem implements TreeNodeInterface
+    class MenuItem implements NodeInterface
     {
         const PATH_SEPARATOR = '/';
 
@@ -94,49 +95,12 @@ but you could use any plain old php class.
         {
             return $this->id;
         }
-
-        /**
-         * @param  string
-         * @return null
-         */
-        public function setId($id)
-        {
-            $this->id = $id;
-        }
-
-        /**
-         * @return string
-         */
-        public function getName()
-        {
-            return $this->name;
-        }
-
-        /**
-         * @param  string
-         * @return null
-         */
-        public function setName($name)
-        {
-            $this->name = $name;
-        }
-
-        /**
-         * @ORM\postLoad
-         **/
-        public function postLoad()
-        {
-            if (null === $this->children) {
-                $this->children = new ArrayCollection;
-            }
-        }
     }
-
 
 ```
 
 
-* Get a hierarchical tree:
+* **Build a hierarchical tree**:
 
 I'm currently using a Doctrine ORM repository to build a flat representation of my tree.
 
@@ -177,8 +141,30 @@ I'm currently using a Doctrine ORM repository to build a flat representation of 
 
 ```
 
+* **Get some flat data**:
 
-* Use it:
+Something like that:
+
+```
+
+     id | locale_id |   name    |    path    | sort |
+    ----+-----------+-----------+------------+------+
+      1 | fr        | fr        | /fr        |      |
+      2 |           | villes    | /fr/2      |      |
+      4 |           | subNantes | /fr/2/3/4  |      |
+      7 | en        | en        | /en        |      |
+      8 |           | villes    | /en/8      |      |
+      9 |           | Nantes    | /en/8/9    |      |
+     10 |           | subNantes | /en/8/9/10 |      |
+     11 |           | Lorient   | /en/8/11   |      |
+     12 |           | Rouen     | /en/8/12   |      |
+      6 |           | Rouen     | /fr/2/6    |    1 |
+      3 |           | Nantes    | /fr/2/3    |    0 |
+      5 |           | Lorient   | /fr/2/5    |    2 |
+
+```
+
+* **Use it**:
 
 ```php
 
@@ -195,4 +181,6 @@ I'm currently using a Doctrine ORM repository to build a flat representation of 
     $em->flush();
 
 ```
+
+To find more usages, you can look at [the tests](https://github.com/knplabs/materialized-path/blob/master/src/tests/Knp/Component/Test/MaterialzedPath/NodeTest.php).
 
