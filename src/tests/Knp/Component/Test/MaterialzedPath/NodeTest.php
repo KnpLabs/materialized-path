@@ -48,20 +48,20 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
 
         $root->buildTree($flatTree);
 
-        $this->assertEquals(1, $root->getChildren()->count());
-        $this->assertEquals(1, $root->getChildren()->get(0)->getChildren()->count());
-        $this->assertEquals(2, $root->getChildren()->get(0)->getChildren()->get(0)->getChildren()->count());
+        $this->assertEquals(1, $root->getNodeChildren()->count());
+        $this->assertEquals(1, $root->getNodeChildren()->get(0)->getNodeChildren()->count());
+        $this->assertEquals(2, $root->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getNodeChildren()->count());
 
         $this->assertEquals(1, $root->getLevel());
-        $this->assertEquals(4, $root->getChildren()->get(0)->getChildren()->get(0)->getChildren()->get(0)->getLevel());
+        $this->assertEquals(4, $root->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getLevel());
     }
 
     public function testChildrenCount()
     {
         $tree = $this->buildTree();
 
-        $this->assertEquals(2, $tree->getChildren()->count());
-        $this->assertEquals(1, $tree->getChildren()->get(0)->getChildren()->count());
+        $this->assertEquals(2, $tree->getNodeChildren()->count());
+        $this->assertEquals(1, $tree->getNodeChildren()->get(0)->getNodeChildren()->count());
     }
 
     public function testGetPath()
@@ -69,30 +69,30 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
         $tree = $this->buildTree();
 
         $this->assertEquals('/1', $tree->getPath());
-        $this->assertEquals('/1/2', $tree->getChildren()->get(0)->getPath());
-        $this->assertEquals('/1/2/4', $tree->getChildren()->get(0)->getChildren()->get(0)->getPath());
-        $this->assertEquals('/1/2/4/5', $tree->getChildren()->get(0)->getChildren()->get(0)->getChildren()->get(0)->getPath());
+        $this->assertEquals('/1/2', $tree->getNodeChildren()->get(0)->getPath());
+        $this->assertEquals('/1/2/4', $tree->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getPath());
+        $this->assertEquals('/1/2/4/5', $tree->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getPath());
 
-        $childChildItem = $tree->getChildren()->get(0)->getChildren()->get(0);
-        $childChildChildItem = $tree->getChildren()->get(0)->getChildren()->get(0)->getChildren()->get(0);
+        $childChildItem = $tree->getNodeChildren()->get(0)->getNodeChildren()->get(0);
+        $childChildChildItem = $tree->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getNodeChildren()->get(0);
         $childChildItem->setChildOf($tree);
         $this->assertEquals('/1/4', $childChildItem->getPath(), 'The path has been updated fo the node');
         $this->assertEquals('/1/4/5', $childChildChildItem->getPath(), 'The path has been updated fo the node and all its descendants');
-        $this->assertTrue($tree->getChildren()->contains($childChildItem), 'The children collection has been updated to reference the moved node');
+        $this->assertTrue($tree->getNodeChildren()->contains($childChildItem), 'The children collection has been updated to reference the moved node');
     }
 
     public function testMoveChildren()
     {
         $tree = $this->buildTree();
 
-        $childChildItem = $tree->getChildren()->get(0)->getChildren()->get(0);
-        $childChildChildItem = $tree->getChildren()->get(0)->getChildren()->get(0)->getChildren()->get(0);
+        $childChildItem = $tree->getNodeChildren()->get(0)->getNodeChildren()->get(0);
+        $childChildChildItem = $tree->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getNodeChildren()->get(0);
         $this->assertEquals(4, $childChildChildItem->getLevel(), 'The level is well calcuated');
 
         $childChildItem->setChildOf($tree);
         $this->assertEquals('/1/4', $childChildItem->getPath(), 'The path has been updated fo the node');
         $this->assertEquals('/1/4/5', $childChildChildItem->getPath(), 'The path has been updated fo the node and all its descendants');
-        $this->assertTrue($tree->getChildren()->contains($childChildItem), 'The children collection has been updated to reference the moved node');
+        $this->assertTrue($tree->getNodeChildren()->contains($childChildItem), 'The children collection has been updated to reference the moved node');
 
         $this->assertEquals(3, $childChildChildItem->getLevel(), 'The level has been updated');
     }

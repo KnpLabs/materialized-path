@@ -4,13 +4,13 @@ namespace Knp\Component\Test\MaterialzedPath\Fixture\php_non_traits;
 
 
 use Knp\Component\Tree\MaterialzedPath\Node;
-use Knp\Component\Tree\MaterialzedPath\NodeInterface as TreeNodeInterface;
+use Knp\Component\Tree\MaterialzedPath\NodeInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 
-class MenuItem implements TreeNodeInterface
+class MenuItem implements NodeInterface
 {
     const PATH_SEPARATOR = '/';
 
@@ -46,34 +46,6 @@ class MenuItem implements TreeNodeInterface
      */
     private $sort;
 
-    /**
-     * Locale
-     * @ORM\ManyToOne(targetEntity="VPAutoBundle\Entity\Locale", fetch="EAGER")
-     */
-    private $locale;
-
-    /**
-     * target
-     *
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $target;
-
-    /**
-     * link
-     *
-     * @var string
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $link;
-
-    /**
-     * Page
-     * @ORM\ManyToOne(targetEntity="VPAutoBundle\Entity\Cms\Page", fetch="EAGER")
-     */
-    private $page;
-
     public function __construct()
     {
         $this->children = new ArrayCollection;
@@ -84,67 +56,6 @@ class MenuItem implements TreeNodeInterface
         return (string) $this->name;
     }
 
-
-    /**
-     * @return string
-     */
-    public function getLink()
-    {
-        return $this->link;
-    }
-
-    /**
-     * @param  string
-     * @return null
-     */
-    public function setLink($link)
-    {
-        $this->link = $link;
-    }
-
-    public function setInternalPage(Page $page = null)
-    {
-        $this->page = $page;
-    }
-
-    public function getInternalPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTarget()
-    {
-        return $this->target;
-    }
-
-    /**
-     * @param  string
-     * @return null
-     */
-    public function setTarget($target)
-    {
-        $this->target = $target;
-    }
-
-    /**
-     * @return Locale
-     */
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    /**
-     * @param  Locale $locale
-     * @return null
-     */
-    public function setLocale(Locale $locale)
-    {
-        $this->locale = $locale;
-    }
 
     /**
      * @return string
@@ -180,34 +91,6 @@ class MenuItem implements TreeNodeInterface
         $this->name = $name;
     }
 
-    public function getOptions()
-    {
-        $options = array(
-            'uri'    => $this->link,
-            'attributes' => array(
-                'id'          => 'menu_'.$this->id,
-                'data-id'     => $this->id,
-            ),
-            'menu'   => $this,
-        );
-        if(null !== $this->getInternalPage()) {
-            $options['route']  = 'frontend_page_view';
-            $options['routeParameters'] = array('slug' => $this->getInternalPage()->getSlug());
-        }
-
-        return $options;
-    }
-
-    /**
-     * @ORM\postLoad
-     **/
-    public function postLoad()
-    {
-        if (null === $this->children) {
-            $this->children = new ArrayCollection;
-        }
-    }
-
     /**
      * Get path.
      *
@@ -230,11 +113,6 @@ class MenuItem implements TreeNodeInterface
         $this->setParentPath($this->getParentPath());
     }
 
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
     public function getNodeChildren()
     {
         return $this->children;
@@ -245,7 +123,7 @@ class MenuItem implements TreeNodeInterface
         $this->children = $children;
     }
 
-    public function addChild(TreeNodeInterface $node)
+    public function addChild(NodeInterface $node)
     {
         $this->children->add($node);
     }
@@ -253,12 +131,12 @@ class MenuItem implements TreeNodeInterface
     /**
      * @return boolean
      */
-    public function isChildOf(TreeNodeInterface $item)
+    public function isChildOf(NodeInterface $item)
     {
         return $this->getParentPath() === $item->getPath();
     }
 
-    public function setChildOf(TreeNodeInterface $item)
+    public function setChildOf(NodeInterface $item)
     {
         $id = $this->getId();
         if (empty($id)) {
@@ -267,13 +145,13 @@ class MenuItem implements TreeNodeInterface
         $this->setPath($item->getPath() . self::PATH_SEPARATOR . $this->getId());
 
         if (null !== $this->parent) {
-            $this->parent->getChildren()->removeElement($this);
+            $this->parent->getNodeChildren()->removeElement($this);
         }
 
         $this->parent = $item;
         $this->parent->addChild($this);
 
-        foreach($this->getChildren() as $child)
+        foreach($this->getNodeChildren() as $child)
         {
             $child->setChildOf($this);
         }

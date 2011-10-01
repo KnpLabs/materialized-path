@@ -19,4 +19,15 @@
         </testsuite>
     </testsuites>
 
+    <filter>
+        <whitelist>
+            <directory>../</directory>
+            <directory>./Knp/Component/Test/MaterialzedPath/Fixture/php_non_traits</directory>
+            <exclude>
+                <file>../Knp/Component/Tree/MaterialzedPath/Node.php</file>
+                <directory>./Knp/Component/Test/MaterialzedPath/Fixture</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
 </phpunit>
