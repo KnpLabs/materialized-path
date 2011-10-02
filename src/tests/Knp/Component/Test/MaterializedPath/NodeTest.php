@@ -1,8 +1,8 @@
 <?php
 
-namespace Knp\Component\Test\MaterialzedPath;
+namespace Knp\Component\Test\MaterializedPath;
 
-use Knp\Component\Test\MaterialzedPath\Fixture\php_non_traits\MenuItem;
+use Knp\Component\Test\MaterializedPath\Fixture\php_non_traits\MenuItem;
 
 abstract class NodeTest extends \PHPUnit_Framework_TestCase
 {

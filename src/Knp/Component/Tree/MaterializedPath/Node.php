@@ -1,8 +1,8 @@
 <?php
 
-namespace Knp\Component\Tree\MaterialzedPath;
+namespace Knp\Component\Tree\MaterializedPath;
 
-use Knp\Component\Tree\MaterialzedPath\NodeInterface as TreeNodeInterface;
+use Knp\Component\Tree\MaterializedPath\NodeInterface as TreeNodeInterface;
 
 use Doctrine\Common\Collections\Collection;
 

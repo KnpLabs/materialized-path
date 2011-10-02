@@ -20,11 +20,11 @@ but you could use any plain old php class.
 
     <?php
 
-    namespace Knp\Component\Test\MaterialzedPath\Fixture;
+    namespace Knp\Component\Test\MaterializedPath\Fixture;
 
 
-    use Knp\Component\Tree\MaterialzedPath\Node;
-    use Knp\Component\Tree\MaterialzedPath\NodeInterface;
+    use Knp\Component\Tree\MaterializedPath\Node;
+    use Knp\Component\Tree\MaterializedPath\NodeInterface;
 
     use Doctrine\Common\Collections\ArrayCollection;
     use Doctrine\ORM\Mapping as ORM;
@@ -41,7 +41,7 @@ but you could use any plain old php class.
         const PATH_SEPARATOR = '/';
 
         // traits baby!
-        // if your php version doesn't support traits, copy paste the methods of Knp\Component\Tree\MaterialzedPath\Node
+        // if your php version doesn't support traits, copy paste the methods of Knp\Component\Tree\MaterializedPath\Node
         use Node {
 
         }
@@ -182,5 +182,5 @@ Something like that:
 
 ```
 
-To find more usages, you can look at [the tests](https://github.com/knplabs/materialized-path/blob/master/src/tests/Knp/Component/Test/MaterialzedPath/NodeTest.php).
+To find more usages, you can look at [the tests](https://github.com/knplabs/materialized-path/blob/master/src/tests/Knp/Component/Test/MaterializedPath/NodeTest.php).
 

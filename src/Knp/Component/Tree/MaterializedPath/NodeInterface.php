@@ -1,6 +1,6 @@
 <?php
 
-namespace Knp\Component\Tree\MaterialzedPath;
+namespace Knp\Component\Tree\MaterializedPath;
 
 use Doctrine\Common\Collections\Collection;
 

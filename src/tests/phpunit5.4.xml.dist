@@ -15,16 +15,16 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>./Knp/Component/Test/MaterialzedPath/php_traits</directory>
+            <directory>./Knp/Component/Test/MaterializedPath/php_traits</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
             <directory>../</directory>
-            <directory>./Knp/Component/Test/MaterialzedPath/Fixture</directory>
+            <directory>./Knp/Component/Test/MaterializedPath/Fixture</directory>
             <exclude>
-                <directory>./Knp/Component/Test/MaterialzedPath/Fixture/php_non_traits</directory>
+                <directory>./Knp/Component/Test/MaterializedPath/Fixture/php_non_traits</directory>
             </exclude>
         </whitelist>
     </filter>

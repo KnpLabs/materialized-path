@@ -1,9 +1,9 @@
 <?php
 
-namespace Knp\Component\Test\Tree\MaterialzedPath\php_non_traits;
+namespace Knp\Component\Test\Tree\MaterializedPath\php_traits;
 
-use Knp\Component\Test\MaterialzedPath\Fixture\php_non_traits\MenuItem;
-use Knp\Component\Test\MaterialzedPath\NodeTest as BaseNodeTest;
+use Knp\Component\Test\MaterializedPath\Fixture\MenuItem;
+use Knp\Component\Test\MaterializedPath\NodeTest as BaseNodeTest;
 
 class NodeTest extends BaseNodeTest
 {
@@ -16,6 +16,5 @@ class NodeTest extends BaseNodeTest
 
         return $node;
     }
-
 }
 

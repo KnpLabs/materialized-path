@@ -1,10 +1,10 @@
 <?php
 
-namespace Knp\Component\Test\MaterialzedPath\Fixture;
+namespace Knp\Component\Test\MaterializedPath\Fixture;
 
 
-use Knp\Component\Tree\MaterialzedPath\Node;
-use Knp\Component\Tree\MaterialzedPath\NodeInterface;
+use Knp\Component\Tree\MaterializedPath\Node;
+use Knp\Component\Tree\MaterializedPath\NodeInterface;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
