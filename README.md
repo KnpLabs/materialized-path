@@ -180,6 +180,9 @@ Something like that:
     $em->persist($menu);
     $em->flush();
 
+    // you have ArrayAccess too
+    $tree[0][1][2] === $tree->getNodeChildren()->get(0)->getNodeChildren()->get(1)->getNodeChildren()->get(2); // true
+
 ```
 
 To find more usages, you can look at [the tests](https://github.com/knplabs/materialized-path/blob/master/src/tests/Knp/Component/Test/MaterializedPath/NodeTest.php).
