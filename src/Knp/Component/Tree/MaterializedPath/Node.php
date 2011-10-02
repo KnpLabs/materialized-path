@@ -261,4 +261,24 @@ trait Node
 
         return $tree;
     }
+
+    public function offsetSet($offset, $node)
+    {
+        $node->setChildOf($this);
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->children[$offset]);
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->children[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->children[$offset];
+    }
 }

@@ -9,7 +9,7 @@ use Knp\Component\Tree\MaterializedPath\NodeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 
-class MenuItem implements NodeInterface
+class MenuItem implements NodeInterface, \ArrayAccess
 {
     const PATH_SEPARATOR = '/';
 
