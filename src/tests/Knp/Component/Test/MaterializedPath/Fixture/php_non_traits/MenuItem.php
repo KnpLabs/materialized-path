@@ -327,7 +327,7 @@ class MenuItem implements NodeInterface, \ArrayAccess
         if(null === $prepare) {
             $prepare = function(NodeInterface $node) {
                 $pre = $node->getLevel() > 1 ? implode('', array_fill(0, $node->getLevel(), '--')) : '';
-                return (string)$node;
+                return $pre.(string)$node;
             };
         }
         if (null === $tree) {

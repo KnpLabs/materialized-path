@@ -107,6 +107,78 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function provideToArray()
+    {
+        $expected = array (
+            1 =>
+            array (
+                'node' => '',
+                'children' =>
+                array (
+                    2 =>
+                    array (
+                        'node' => '',
+                        'children' =>
+                        array (
+                            4 =>
+                            array (
+                                'node' => '',
+                                'children' =>
+                                array (
+                                    5 =>
+                                    array (
+                                        'node' => '',
+                                        'children' =>
+                                        array (
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    3 =>
+                    array (
+                        'node' => '',
+                        'children' =>
+                        array (
+                        ),
+                    ),
+                ),
+            ),
+        );
+
+        return $expected;
+    }
+
+    public function testToArray()
+    {
+        $expected = $this->provideToArray();
+        $tree = $this->buildTree();
+        $this->assertEquals($expected, $tree->toArray());
+    }
+
+    public function testToJson()
+    {
+        $expected = $this->provideToArray();
+        $tree = $this->buildTree();
+        $this->assertEquals(json_encode($expected), $tree->toJson());
+    }
+
+    public function testToFlatArray()
+    {
+        $tree = $this->buildTree();
+
+        $expected = array (
+          1 => '',
+          2 => '----',
+          4 => '------',
+          5 => '--------',
+          3 => '----',
+        );
+
+        $this->assertEquals($expected, $tree->toFlatArray());
+    }
+
     public function testArrayAccess()
     {
         $tree = $this->buildTree();
