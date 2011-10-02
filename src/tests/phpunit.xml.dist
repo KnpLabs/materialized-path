@@ -25,7 +25,10 @@
             <directory>./Knp/Component/Test/MaterializedPath/Fixture/php_non_traits</directory>
             <exclude>
                 <file>../Knp/Component/Tree/MaterializedPath/Node.php</file>
-                <directory>./Knp/Component/Test/MaterializedPath/Fixture</directory>
+                <file>./Knp/Component/Test/MaterializedPath/Fixture/MenuItem.php</file>
+                <directory>./Knp/Component/Test/MaterializedPath/php_traits</directory>
+                <directory>./Knp/Component/Test/MaterializedPath/php_non_traits</directory>
+                <file>./Knp/Component/Test/MaterializedPath/NodeTest.php</file>
             </exclude>
         </whitelist>
     </filter>

@@ -2,7 +2,7 @@
 
 namespace Knp\Component\Tree\MaterializedPath;
 
-use Knp\Component\Tree\MaterializedPath\NodeInterface as TreeNodeInterface;
+use Knp\Component\Tree\MaterializedPath\NodeInterface;
 
 use Doctrine\Common\Collections\Collection;
 
@@ -12,20 +12,16 @@ use Doctrine\Common\Collections\Collection;
 trait Node
 {
     /**
-     * Get path.
-     *
-     * @return path.
-     */
+     * {@inheritdoc}
+     **/
     public function getPath()
     {
         return $this->path;
     }
 
     /**
-     * Set path.
-     *
-     * @param path the value to set.
-     */
+     * {@inheritdoc}
+     **/
     public function setPath($path)
     {
         $this->path = $path;
@@ -33,35 +29,42 @@ trait Node
         $this->setParentPath($this->getParentPath());
     }
 
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
+    /**
+     * {@inheritdoc}
+     **/
     public function getNodeChildren()
     {
         return $this->children;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function setNodeChildren(Collection $children)
     {
         $this->children = $children;
     }
 
-    public function addChild(TreeNodeInterface $node)
+    /**
+     * {@inheritdoc}
+     **/
+    public function addChild(NodeInterface $node)
     {
         $this->children->add($node);
     }
 
     /**
-     * @return boolean
-     */
-    public function isChildOf(TreeNodeInterface $node)
+     * {@inheritdoc}
+     **/
+    public function isChildOf(NodeInterface $node)
     {
         return $this->getParentPath() === $node->getPath();
     }
 
-    public function setChildOf(TreeNodeInterface $node)
+    /**
+     * {@inheritdoc}
+     **/
+    public function setChildOf(NodeInterface $node)
     {
         $id = $this->getId();
         if (empty($id)) {
@@ -85,6 +88,9 @@ trait Node
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getParentPath()
     {
         $path = $this->getExplodedPath();
@@ -96,43 +102,43 @@ trait Node
     }
 
     /**
-     * Set parent path.
-     *
-     * @param path the value to set.
-     */
+     * {@inheritdoc}
+     **/
     public function setParentPath($path)
     {
         $this->parent_path = $path;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getParent()
     {
         return $this->parent;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function setParent(NodeInterface $node)
     {
         $this->parent = $node;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getExplodedPath()
     {
         return \explode(self::PATH_SEPARATOR, $this->getPath());
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getLevel()
     {
         return \count($this->getExplodedPath()) - 1;
-    }
-
-    /**
-     * Get sort.
-     *
-     * @return sort.
-     */
-    public function getSort()
-    {
-        return $this->sort;
     }
 
     /**
@@ -140,11 +146,22 @@ trait Node
      *
      * @param sort the value to set.
      */
+    public function getSort()
+    {
+        return $this->sort;
+    }
+
+    /**
+     * {@inheritdoc}
+     **/
     public function setSort($sort)
     {
         $this->sort = $sort;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getRootPath()
     {
         $explodedPath = $this->getExplodedPath();
@@ -153,16 +170,22 @@ trait Node
         return self::PATH_SEPARATOR . array_shift($explodedPath);
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getRoot()
     {
         $parent = $this;
-        while(null !== $parent) {
+        while(null !== $parent->getParent()) {
             $parent = $parent->getParent();
         }
 
         return $parent;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function buildTree(\Traversable $results)
     {
         $tree = array($this->getPath() => $this);
@@ -213,6 +236,12 @@ trait Node
         return $tree;
     }
 
+    /**
+     * @param \Closure $prepare a function to preapre the node before putting into the result
+     * @param array $tree a reference to an array, used internally for recursion
+     *
+     * @return array the flatten result
+     **/
     public function toFlatArray(\Closure $prepare = null, array &$tree = null)
     {
         if(null === $prepare) {

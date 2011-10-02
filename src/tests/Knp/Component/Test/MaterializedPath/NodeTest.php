@@ -2,6 +2,8 @@
 
 namespace Knp\Component\Test\MaterializedPath;
 
+use Knp\Component\Tree\MaterializedPath\NodeInterface;
+
 use Knp\Component\Test\MaterializedPath\Fixture\php_non_traits\MenuItem;
 
 abstract class NodeTest extends \PHPUnit_Framework_TestCase
@@ -54,6 +56,83 @@ abstract class NodeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $root->getLevel());
         $this->assertEquals(4, $root->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getLevel());
+    }
+
+    public function testGetRoot()
+    {
+        $tree = $this->buildTree();
+
+        $this->assertEquals($tree, $tree->getRoot());
+        $this->assertNull($tree->getRoot()->getParent());
+
+        $this->assertEquals($tree, $tree->getNodeChildren()->get(0)->getNodeChildren()->get(0)->getRoot());
+    }
+
+    /**
+     * @dataProvider provideRootPaths
+     **/
+    public function testGetRootPath(NodeInterface $node, $expected)
+    {
+        $this->assertEquals($expected, $node->getRootPath());
+    }
+
+    public function provideRootPaths()
+    {
+        return array(
+            array($this->buildNode(array('setPath' => '/0/1'))            , '/0'),
+            array($this->buildNode(array('setPath' => '/'))               , '/'),
+            array($this->buildNode(array('setPath' => ''))                , '/'),
+            array($this->buildNode(array('setPath' => '/test'))           , '/test'),
+            array($this->buildNode(array('setPath' => '/0/1/2/3/4/5/6/')) , '/0'),
+        );
+    }
+
+    /**
+     * @dataProvider provideIsChildOf
+     **/
+    public function testIsChildOf(NodeInterface $child, NodeInterface $parent, $expected)
+    {
+        $this->assertEquals($expected, $child->isChildOf($parent));
+    }
+
+    public function provideIsChildOf()
+    {
+        $tree = $this->buildTree();
+
+        return array(
+            array($tree[0][0]    ,  $tree[0]          ,  true),
+            array($tree[0][0][0] ,  $tree[0][0]       ,  true),
+            array($tree[0][0][0] ,  $tree[0]          ,  false),
+            array($tree[0][0][0] ,  $tree[0][0][0]    ,  false),
+        );
+    }
+
+    public function testArrayAccess()
+    {
+        $tree = $this->buildTree();
+
+        $tree[] = $this->buildNode(array('setId' => 45));
+        $tree[] = $this->buildNode(array('setId' => 46));
+        $this->assertEquals(4, $tree->getNodeChildren()->count());
+
+        $tree[2][] = $this->buildNode(array('setId' => 47));
+        $tree[2][] = $this->buildNode(array('setId' => 48));
+        $this->assertEquals(2, $tree[2]->getNodeChildren()->count());
+
+        $this->assertTrue(isset($tree[2][1]));
+        $this->assertFalse(isset($tree[2][1][2]));
+
+        unset($tree[2][1]);
+        $this->assertFalse(isset($tree[2][1]));
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage You must provide an id for this node if you want it to be part of a tree.
+     **/
+    public function testSetChildOfWithoutId()
+    {
+        $this->buildNode(array('setPath' => '/0/1'))->setChildOf($this->buildNode(array('setPath' => '/0')));
     }
 
     public function testChildrenCount()

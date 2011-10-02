@@ -10,7 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 
-class MenuItem implements NodeInterface
+class MenuItem implements NodeInterface, \ArrayAccess
 {
     const PATH_SEPARATOR = '/';
 
@@ -92,20 +92,16 @@ class MenuItem implements NodeInterface
     }
 
     /**
-     * Get path.
-     *
-     * @return path.
-     */
+     * {@inheritdoc}
+     **/
     public function getPath()
     {
         return $this->path;
     }
 
     /**
-     * Set path.
-     *
-     * @param path the value to set.
-     */
+     * {@inheritdoc}
+     **/
     public function setPath($path)
     {
         $this->path = $path;
@@ -113,42 +109,55 @@ class MenuItem implements NodeInterface
         $this->setParentPath($this->getParentPath());
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getNodeChildren()
     {
         return $this->children;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function setNodeChildren(Collection $children)
     {
         $this->children = $children;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function addChild(NodeInterface $node)
     {
         $this->children->add($node);
     }
 
     /**
-     * @return boolean
-     */
-    public function isChildOf(NodeInterface $item)
+     * {@inheritdoc}
+     **/
+    public function isChildOf(NodeInterface $node)
     {
-        return $this->getParentPath() === $item->getPath();
+        return $this->getParentPath() === $node->getPath();
     }
 
-    public function setChildOf(NodeInterface $item)
+    /**
+     * {@inheritdoc}
+     **/
+    public function setChildOf(NodeInterface $node)
     {
         $id = $this->getId();
         if (empty($id)) {
             throw new \LogicException('You must provide an id for this node if you want it to be part of a tree.');
         }
-        $this->setPath($item->getPath() . self::PATH_SEPARATOR . $this->getId());
+
+        $this->setPath($node->getPath() . self::PATH_SEPARATOR . $this->getId());
 
         if (null !== $this->parent) {
             $this->parent->getNodeChildren()->removeElement($this);
         }
 
-        $this->parent = $item;
+        $this->parent = $node;
         $this->parent->addChild($this);
 
         foreach($this->getNodeChildren() as $child)
@@ -159,6 +168,9 @@ class MenuItem implements NodeInterface
         return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getParentPath()
     {
         $path = $this->getExplodedPath();
@@ -166,42 +178,47 @@ class MenuItem implements NodeInterface
 
         $parent_path = \implode(self::PATH_SEPARATOR, $path);
 
-        return $parent_path;
+        return $parent_path ?: self::PATH_SEPARATOR;
     }
 
     /**
-     * Set parent path.
-     *
-     * @param path the value to set.
-     */
+     * {@inheritdoc}
+     **/
     public function setParentPath($path)
     {
         $this->parent_path = $path;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getParent()
     {
         return $this->parent;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
+    public function setParent(NodeInterface $node)
+    {
+        $this->parent = $node;
+    }
+
+    /**
+     * {@inheritdoc}
+     **/
     public function getExplodedPath()
     {
         return \explode(self::PATH_SEPARATOR, $this->getPath());
     }
 
+    /**
+     * {@inheritdoc}
+     **/
     public function getLevel()
     {
         return \count($this->getExplodedPath()) - 1;
-    }
-
-    /**
-     * Get sort.
-     *
-     * @return sort.
-     */
-    public function getSort()
-    {
-        return $this->sort;
     }
 
     /**
@@ -209,27 +226,140 @@ class MenuItem implements NodeInterface
      *
      * @param sort the value to set.
      */
+    public function getSort()
+    {
+        return $this->sort;
+    }
+
+    /**
+     * {@inheritdoc}
+     **/
     public function setSort($sort)
     {
         $this->sort = $sort;
     }
 
+    /**
+     * {@inheritdoc}
+     **/
+    public function getRootPath()
+    {
+        $explodedPath = $this->getExplodedPath();
+        array_shift($explodedPath); // first is empty
+
+        return self::PATH_SEPARATOR . array_shift($explodedPath);
+    }
+
+    /**
+     * {@inheritdoc}
+     **/
+    public function getRoot()
+    {
+        $parent = $this;
+        while(null !== $parent->getParent()) {
+            $parent = $parent->getParent();
+        }
+
+        return $parent;
+    }
+
+    /**
+     * {@inheritdoc}
+     **/
     public function buildTree(\Traversable $results)
     {
         $tree = array($this->getPath() => $this);
-        foreach($results as $item) {
-            $parentPath = $item->getParentPath();
-            if(!isset($tree[$parentPath])) {
-                $tree[$parentPath] = $this;
-            }
+        foreach($results as $node) {
 
-            $tree[$parentPath]->addChild($item);
+            $tree[$node->getPath()] = $node;
 
-            if(!isset($tree[$item->getPath()])) {
-                $tree[$item->getPath()] = $item;
-            }
+            $parent = isset($tree[$node->getParentPath()]) ? $tree[$node->getParentPath()] : $this; // root is the fallback parent
+            $parent->addChild($node);
+            $node->setParent($parent);
         }
     }
 
+    /**
+     * @param \Closure $prepare a function to preapre the node before putting into the result
+     *
+     * @return string the json representation of the hierarchical result
+     **/
+    public function toJson(\Closure $prepare = null)
+    {
+        $tree = $this->toArray($prepare);
+
+        return json_encode($tree);
+    }
+
+    /**
+     * @param \Closure $prepare a function to preapre the node before putting into the result
+     * @param array $tree a reference to an array, used internally for recursion
+     *
+     * @return array the hierarchical result
+     **/
+    public function toArray(\Closure $prepare = null, array &$tree = null)
+    {
+        if(null === $prepare) {
+            $prepare = function(NodeInterface $node) {
+                return (string)$node;
+            };
+        }
+        if (null === $tree) {
+            $tree = array($this->getId() => array('node' => $prepare($this), 'children' => array()));
+        }
+
+        foreach($this->getNodeChildren() as $node) {
+            $tree[$this->getId()]['children'][$node->getId()] = array('node' => $prepare($node), 'children' => array());
+            $node->toArray($prepare, $tree[$this->getId()]['children']);
+        }
+
+        return $tree;
+    }
+
+    /**
+     * @param \Closure $prepare a function to preapre the node before putting into the result
+     * @param array $tree a reference to an array, used internally for recursion
+     *
+     * @return array the flatten result
+     **/
+    public function toFlatArray(\Closure $prepare = null, array &$tree = null)
+    {
+        if(null === $prepare) {
+            $prepare = function(NodeInterface $node) {
+                $pre = $node->getLevel() > 1 ? implode('', array_fill(0, $node->getLevel(), '--')) : '';
+                return (string)$node;
+            };
+        }
+        if (null === $tree) {
+            $tree = array($this->getId() => $prepare($this));
+        }
+
+        foreach($this->getNodeChildren() as $node) {
+            $tree[$node->getId()] = $prepare($node);
+            $node->toFlatArray($prepare, $tree);
+        }
+
+        return $tree;
+    }
+
+    public function offsetSet($offset, $node)
+    {
+        $node->setChildOf($this);
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->children[$offset]);
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->children[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->children[$offset];
+    }
 }
 
