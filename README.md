@@ -59,12 +59,12 @@ but you could use any plain old php class.
         protected $name;
 
         /**
-         * @param Collection the children in the tree
+         * @var Collection the children in the tree
          */
         private $children;
 
         /**
-         * @param NodeInterface the parent in the tree
+         * @var NodeInterface the parent in the tree
          */
         private $parent;
 
